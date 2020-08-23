@@ -50,7 +50,14 @@ class MainController extends Controller {
         $token = $request->session()->get('token');
         $this->client->setAccessToken($token);
         $cli = $this->makePhotosCli($token['access_token']);
-        $resp = $cli->listMediaItems();
+        $resp = $cli->listAlbums();
+        $tgtAlbumId = null;
+        foreach ($resp->iterateAllElements() as $item) {
+            if ($item->getTitle() === 'album001') {
+                $tgtAlbumId = $item->getId();
+            }
+        }
+        $resp = $cli->searchMediaItems(['albumId' => $tgtAlbumId]);
         foreach ($resp->iterateAllElements() as $item) {
             $mediaResp = $cli->getMediaItem($item->getId());
             $data[] = [
